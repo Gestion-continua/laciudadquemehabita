@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quiz Interactivo - Dream with AI Style</title>
+  <title>Quiz Interactivo - Desafío Urbano</title>
   
   <!-- Tipografías Oficiales: Instrument Serif + Noto Sans Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Noto+Sans+Mono:wght@300;400;600&display=swap" rel="stylesheet">
-
-  <!-- Hoja de Estilos CSS Externa -->
+  
+  <!-- Hoja de Estilos Externa -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- SDK OFICIAL DE SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -49,6 +52,7 @@
 
     <!-- PANTALLA 1: INICIO -->
     <section id="screen-start" class="screen active">
+      <img src="images/logo-epa.png" alt="Logo EPA" class="epa-logo" />
       <div>
         <span class="category-meta">> BUENOS AIRES // EVALUACIÓN</span>
         <h1 class="hero-title">Desafío Urbano & Cultural</h1>
@@ -56,7 +60,7 @@
       <p class="question-statement">
         Una experiencia inmersiva sobre la historia, arquitectura, gastronomía y leyendas ocultas de la ciudad.
       </p>
-      <button class="btn-noir" onclick="openTermsModal()">INICIAR EXPERIMENTO_</button>
+      <button class="btn-noir" id="btn-start-trigger" onclick="openTermsModal()">INICIAR EXPERIMENTO_</button>
     </section>
 
     <!-- PANTALLA 2: QUIZ ACTIVO -->
@@ -71,17 +75,21 @@
       </div>
     </section>
 
-    <!-- PANTALLA 3: RESULTADOS -->
+    <!-- PANTALLA 3: RESULTADOS & RANKING (SESIÓN FINALIZADA) -->
     <section id="screen-results" class="screen">
       <div>
-        <span class="category-meta">> EXPERIMENTO FINALIZADO</span>
-        <h1 class="hero-title">Resumen de Datos</h1>
+        <span class="category-meta">> REGISTRO FINALIZADO</span>
+        <h1 class="hero-title">¡Muchas gracias por participar!</h1>
       </div>
+
+      <p class="question-statement">
+        Tus respuestas y puntaje ya fueron guardados en la base de datos del evento.
+      </p>
 
       <div class="results-grid">
         <div class="result-card">
           <span class="result-val" id="res-score">0</span>
-          <span class="result-lbl">PUNTOS TOTALES</span>
+          <span class="result-lbl">TU PUNTAJE</span>
         </div>
         <div class="result-card">
           <span class="result-val" id="res-accuracy">0%</span>
@@ -89,7 +97,48 @@
         </div>
       </div>
 
-      <button class="btn-noir" onclick="openTermsModal()">REINICIAR SESIÓN_</button>
+      <!-- TABLA DE MEJORES PUESTOS -->
+      <div class="leaderboard-box">
+        <span class="category-meta">> TOP 5 MEJORES PUNTAJES</span>
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>PARTICIPANTE</th>
+              <th>PUNTOS</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <tr><td colspan="3">Cargando posiciones...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PANTALLA 4: YA PARTICIPÓ (BLOQUEO DE SESIÓN) -->
+    <section id="screen-already-played" class="screen">
+      <div>
+        <span class="category-meta">> ACCESO RESTRINGIDO</span>
+        <h1 class="hero-title">Sesión Completada</h1>
+      </div>
+      <p class="question-statement">
+        Ya has participado en este concurso. Solo se permite un intento por participante para garantizar la transparencia del evento.
+      </p>
+      <div class="leaderboard-box">
+        <span class="category-meta">> TOP 5 MEJORES PUNTAJES</span>
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>PARTICIPANTE</th>
+              <th>PUNTOS</th>
+            </tr>
+          </thead>
+          <tbody id="already-played-leaderboard">
+            <tr><td colspan="3">Cargando posiciones...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Footer Inferior -->
