@@ -1,3 +1,9 @@
+// --- CONFIGURACIÓN DE SUPABASE ---
+const SUPABASE_URL = "https://bcpstmfxemrcidwgthxx.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_cauPjclntOUrIeeQxpftAg_icxWbiVD";
+
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
 // MAPA DE IMÁGENES POR CATEGORÍA
 const CATEGORY_BACKGROUNDS = {
   "Historia y Arquitectura": "images/historia.jpg",
@@ -16,18 +22,30 @@ let correctCount = 0;
 
 let timerInterval = null;
 let secondsElapsed = 0;
-
-// Almacenar datos del participante activo
 let currentUser = null;
 
-// Cargar preguntas desde JSON o fallback
+// Verificar sesión previa al cargar
+window.addEventListener('DOMContentLoaded', () => {
+  checkPreviousSession();
+  loadQuestions();
+});
+
+function checkPreviousSession() {
+  const played = localStorage.getItem('quiz_played');
+  if (played === 'true') {
+    showScreen('screen-already-played');
+    loadLeaderboard('already-played-leaderboard');
+  }
+}
+
+// Cargar preguntas desde JSON
 async function loadQuestions() {
   try {
     const response = await fetch('preguntas.json');
     if(!response.ok) throw new Error("No se pudo cargar preguntas.json");
     allQuestions = await response.json();
   } catch (err) {
-    console.warn("Cargando preguntas de reserva local:", err);
+    console.warn("Cargando preguntas de reserva local por error en fetch:", err);
     allQuestions = [
       {
         id: 1,
@@ -53,6 +71,10 @@ async function loadQuestions() {
 
 // FUNCIONES DEL MODAL Y REGISTRO
 function openTermsModal() {
+  if (localStorage.getItem('quiz_played') === 'true') {
+    showScreen('screen-already-played');
+    return;
+  }
   const modal = document.getElementById('terms-modal');
   if(modal) modal.classList.add('active');
 }
@@ -76,13 +98,7 @@ function validateForm() {
 
   const btnConfirm = document.getElementById('btn-confirm-start');
 
-  // Evaluar que todos los campos y los 4 checkboxes estén completos
-  const inputsValid = name !== '' && 
-                      lastname !== '' && 
-                      email.includes('@') && 
-                      phone !== '' && 
-                      admin !== '';
-
+  const inputsValid = name !== '' && lastname !== '' && email.includes('@') && phone !== '' && admin !== '';
   const checksValid = checkAge && checkAdmin && checkTerms && checkPenalty;
 
   if (btnConfirm) {
@@ -90,11 +106,34 @@ function validateForm() {
   }
 }
 
-function confirmAndStart() {
+async function confirmAndStart() {
+  const email = document.getElementById('reg-email').value.trim();
+
+  // Verificar si el correo ya participó en Supabase
+  if (supabaseClient) {
+    try {
+      const { data } = await supabaseClient
+        .from('participantes')
+        .select('id')
+        .eq('email', email);
+
+      if (data && data.length > 0) {
+        alert("Este correo electrónico ya ha sido registrado en una participación previa.");
+        localStorage.setItem('quiz_played', 'true');
+        closeTermsModal();
+        showScreen('screen-already-played');
+        loadLeaderboard('already-played-leaderboard');
+        return;
+      }
+    } catch(err) {
+      console.warn("No se pudo verificar el correo en Supabase:", err);
+    }
+  }
+
   currentUser = {
     nombre: document.getElementById('reg-name').value.trim(),
     apellido: document.getElementById('reg-lastname').value.trim(),
-    email: document.getElementById('reg-email').value.trim(),
+    email: email,
     telefono: document.getElementById('reg-phone').value.trim(),
     administracion: document.getElementById('reg-admin').value.trim()
   };
@@ -113,7 +152,6 @@ function startQuiz() {
   correctCount = 0;
   secondsElapsed = 0;
 
-  // Cambiar fondo de video (Intro) a imagen
   const bgVid = document.getElementById('bg-video');
   const bgImg = document.getElementById('bg-image');
   if (bgVid) bgVid.classList.remove('active');
@@ -132,20 +170,17 @@ function startQuiz() {
 function renderQuestion() {
   const q = currentQuestions[currentIndex];
 
-  // Actualizar imagen de fondo por categoría
   const bgImg = document.getElementById('bg-image');
   if (bgImg && CATEGORY_BACKGROUNDS[q.categoria]) {
     bgImg.src = CATEGORY_BACKGROUNDS[q.categoria];
   }
   
-  // Actualizar barra de progreso
   const progressFill = document.getElementById('progress-fill');
   if (progressFill) {
     const progressPercent = ((currentIndex) / QUESTIONS_PER_ROUND) * 100;
     progressFill.style.width = `${progressPercent}%`;
   }
 
-  // Textos y Contador
   document.getElementById('quiz-category').textContent = `> ${q.categoria.toUpperCase()}`;
   document.getElementById('quiz-question').textContent = q.pregunta;
   document.getElementById('counter-display').textContent = 
@@ -154,7 +189,6 @@ function renderQuestion() {
   const optionsContainer = document.getElementById('quiz-options');
   optionsContainer.innerHTML = '';
 
-  // Opciones de Respuesta
   q.opciones.forEach((opcion, idx) => {
     const btn = document.createElement('button');
     btn.className = 'option-item';
@@ -164,7 +198,7 @@ function renderQuestion() {
   });
 }
 
-// Procesar Respuesta y Efectos Visuales
+// Procesar Respuesta
 function handleAnswer(selectedIndex, selectedBtn) {
   const q = currentQuestions[currentIndex];
   const allBtns = document.querySelectorAll('.option-item');
@@ -201,21 +235,75 @@ function handleAnswer(selectedIndex, selectedBtn) {
   }, 1300);
 }
 
-// Finalizar Quiz
-function finishQuiz() {
+// Finalizar Quiz y Guardar en Supabase
+async function finishQuiz() {
   stopTimer();
+  
+  // Bloquear reintento localmente
+  localStorage.setItem('quiz_played', 'true');
+
   const progressFill = document.getElementById('progress-fill');
   if (progressFill) progressFill.style.width = '100%';
   
-  document.getElementById('res-score').textContent = score;
-  
   const accuracy = Math.round((correctCount / currentQuestions.length) * 100);
+  document.getElementById('res-score').textContent = score;
   document.getElementById('res-accuracy').textContent = `${accuracy}%`;
 
   const footerStatus = document.getElementById('footer-status');
   if (footerStatus) footerStatus.textContent = 'STATUS: FINISHED';
-  
+
+  // Guardar en Supabase
+  if (supabaseClient && currentUser) {
+    try {
+      await supabaseClient.from('participantes').insert([
+        {
+          nombre: currentUser.nombre,
+          apellido: currentUser.apellido,
+          email: currentUser.email,
+          telefono: currentUser.telefono,
+          administracion: currentUser.administracion,
+          score: score,
+          accuracy: accuracy,
+          tiempo_segundos: secondsElapsed
+        }
+      ]);
+    } catch (err) {
+      console.error("Error guardando datos en Supabase:", err);
+    }
+  }
+
   showScreen('screen-results');
+  loadLeaderboard('leaderboard-body');
+}
+
+// Cargar Top 5 en Tabla de Posiciones
+async function loadLeaderboard(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container || !supabaseClient) return;
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('participantes')
+      .select('nombre, apellido, score, tiempo_segundos')
+      .order('score', { ascending: false })
+      .order('tiempo_segundos', { ascending: true })
+      .limit(5);
+
+    if (error || !data || data.length === 0) {
+      container.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No hay registros cargados aún</td></tr>`;
+      return;
+    }
+
+    container.innerHTML = data.map((item, index) => `
+      <tr>
+        <td><strong>#${index + 1}</strong></td>
+        <td>${item.nombre} ${item.apellido ? item.apellido.charAt(0) + '.' : ''}</td>
+        <td><strong>${item.score} pts</strong></td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Error al conectar con el ranking</td></tr>`;
+  }
 }
 
 // Control del temporizador
@@ -235,7 +323,6 @@ function stopTimer() {
 
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
+  const targetScreen = document.getElementById(screenId);
+  if (targetScreen) targetScreen.classList.add('active');
 }
-
-loadQuestions();
