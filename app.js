@@ -24,20 +24,14 @@ let timerInterval = null;
 let secondsElapsed = 0;
 let currentUser = null;
 
-// Verificar sesión previa al cargar, EXCEPTO si es tester
+// Al cargar la página, aseguramos que la pantalla de inicio esté activa y limpia
 window.addEventListener('DOMContentLoaded', () => {
+  showScreen('screen-start');
   loadQuestions();
   setupEmailListener();
-  
-  // Limpiamos la traba estricta de localStorage para evitar bloqueos fantasma en pruebas
-  const played = localStorage.getItem('quiz_played');
-  if (played === 'true') {
-    // Si ya jugó pero queremos permitir testers, verificamos si Supabase tiene su registro o dejamos entrar
-    // Dejamos que el modal valide según el correo ingresado.
-  }
 });
 
-// Detección automática para anular el campo administración si es tester
+// Detección automática para anular el campo administración si es tester (@gestionar.com u @octopus.com.ar)
 function setupEmailListener() {
   const emailInput = document.getElementById('reg-email');
   const adminInput = document.getElementById('reg-admin');
@@ -45,7 +39,7 @@ function setupEmailListener() {
   if (emailInput && adminInput) {
     const checkTesterField = () => {
       const email = emailInput.value.trim().toLowerCase();
-      const isTester = email.includes('@octopus') || email.includes('@gestionar');
+      const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar') || email.includes('@gestionar') || email.includes('@octopus');
 
       if (isTester) {
         adminInput.value = "usuario tester";
@@ -116,7 +110,7 @@ async function loadQuestions() {
 function openTermsModal() {
   const emailInput = document.getElementById('reg-email');
   const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
-  const isTester = email.includes('@octopus') || email.includes('@gestionar');
+  const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar') || email.includes('@gestionar') || email.includes('@octopus');
 
   // Si no es tester y ya jugó, mostramos pantalla de ya participó
   if (!isTester && localStorage.getItem('quiz_played') === 'true') {
@@ -160,8 +154,8 @@ function validateForm() {
 async function confirmAndStart() {
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
 
-  // EXCEPCIÓN DE PRUEBA / TESTER
-  const isTester = email.includes('@octopus') || email.includes('@gestionar');
+  // EXCEPCIÓN DE PRUEBA / TESTER EXACTA
+  const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar') || email.includes('@gestionar') || email.includes('@octopus');
 
   // Si NO es un correo tester, verificar si ya jugó en la Base de Datos Supabase
   if (!isTester && supabaseClient) {
@@ -295,7 +289,7 @@ async function finishQuiz() {
   stopTimer();
   
   const email = currentUser ? currentUser.email.toLowerCase() : '';
-  const isTester = email.includes('@octopus') || email.includes('@gestionar');
+  const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar') || email.includes('@gestionar') || email.includes('@octopus');
 
   if (!isTester) {
     localStorage.setItem('quiz_played', 'true');
