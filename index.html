@@ -4,88 +4,66 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quiz Interactivo - Desafío Urbano</title>
-  
-  <!-- Tipografías Oficiales: Instrument Serif + Noto Sans Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Noto+Sans+Mono:wght@300;400;600&display=swap" rel="stylesheet">
-  
-  <!-- Hoja de Estilos Externa -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- SDK OFICIAL DE SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-  <!-- CAPA DE FONDO: VIDEO INTRO O IMAGEN SEGÚN CATEGORÍA -->
   <div class="background-wrapper">
     <video id="bg-video" class="bg-media active" autoplay loop muted playsinline>
       <source src="intro_buenos_aires.mp4" type="video/mp4">
     </video>
-    
     <img id="bg-image" class="bg-media" src="images/historia.jpg" alt="Fondo Categoría">
-    
     <div class="video-overlay"></div>
     <div id="feedback-flash" class="flash-layer"></div>
   </div>
 
-  <!-- INTERFAZ PRINCIPAL -->
   <div class="app-wrapper" id="main-wrapper">
-    
-    <!-- Header Superior -->
     <header class="top-bar">
       <div class="status-tag">
         <span class="status-dot"></span>
-        <span id="system-status">EPA 10 AÑOS</span>
+        <span id="system-status">EPA| 10 AÑOS</span>
       </div>
-
       <div class="progress-container">
         <div class="progress-fill" id="progress-fill"></div>
       </div>
-
       <div class="timer-box" id="timer-display">00:00</div>
       <div>
         <span id="counter-display">00/10</span>
       </div>
     </header>
 
-    <!-- PANTALLA 1: INICIO -->
     <section id="screen-start" class="screen active">
       <img src="images/logo-epa.png" alt="Logo EPA" class="epa-logo" />
       <div>
-        <span class="category-meta">> Cuanto sabes realmente?</span>
-        <h1 class="hero-title">La ciudad que me habita</h1>
+        <h1 class="hero-title">LA CI<i>UDAD</i></span>
+        <h1 class="hero-title">QUE ME HABITA</h1>
       </div>
       <p class="question-statement">
-        Una experiencia inmersiva sobre la historia, arquitectura, gastronomía y leyendas ocultas de la ciudad.
+        10 preguntas sobre la historia, arquitectura, gastronomía y leyendas urbanas.
+        ¿Cuanto sabes realmente sobre la ciudad de la furia?
       </p>
-      <button class="btn-noir" id="btn-start-trigger" onclick="openTermsModal()">INICIAR EXPERIMENTO_</button>
+      <button class="btn-noir" id="btn-start-trigger" onclick="openTermsModal()">Comenzar</button>
     </section>
 
-    <!-- PANTALLA 2: QUIZ ACTIVO -->
     <section id="screen-quiz" class="screen">
       <div class="question-card" id="question-card">
         <span class="category-meta" id="quiz-category">> CATEGORÍA</span>
         <p class="question-statement" id="quiz-question">Cargando pregunta...</p>
       </div>
-
-      <div class="options-grid" id="quiz-options">
-        <!-- Opciones generadas dinámicamente -->
-      </div>
+      <div class="options-grid" id="quiz-options"></div>
     </section>
 
-    <!-- PANTALLA 3: RESULTADOS & RANKING (SESIÓN FINALIZADA) -->
     <section id="screen-results" class="screen">
       <div>
         <span class="category-meta">> REGISTRO FINALIZADO</span>
         <h1 class="hero-title">¡Muchas gracias por participar!</h1>
       </div>
-
       <p class="question-statement">
-        Tus respuestas y puntaje ya fueron guardados en nuestra base de datos.
+        Tus respuestas y puntaje ya fueron guardados en la base de datos del evento.
       </p>
-
       <div class="results-grid">
         <div class="result-card">
           <span class="result-val" id="res-score">0</span>
@@ -96,8 +74,6 @@
           <span class="result-lbl">PRECISIÓN</span>
         </div>
       </div>
-
-      <!-- TABLA DE MEJORES PUESTOS -->
       <div class="leaderboard-box">
         <span class="category-meta">> TOP 5 MEJORES PUNTAJES</span>
         <table class="leaderboard-table">
@@ -115,14 +91,13 @@
       </div>
     </section>
 
-    <!-- PANTALLA 4: YA PARTICIPÓ (BLOQUEO DE SESIÓN) -->
     <section id="screen-already-played" class="screen">
       <div>
         <span class="category-meta">> ACCESO RESTRINGIDO</span>
         <h1 class="hero-title">Sesión Completada</h1>
       </div>
       <p class="question-statement">
-        Ya participaste en este concurso. Solo se permite un intento por participante para garantizar la transparencia del evento.
+        Ya has participado en este concurso. Solo se permite un intento por participante para garantizar la transparencia del evento.
       </p>
       <div class="leaderboard-box">
         <span class="category-meta">> TOP 5 MEJORES PUNTAJES</span>
@@ -141,27 +116,21 @@
       </div>
     </section>
 
-    <!-- Footer Inferior -->
     <footer class="bottom-bar">
-      <span id="footer-status">Powered by Academia Gestionar</span>
-      <span>Suscribite a talleres wepa</span>
+      <span id="footer-status">POWERED BY ACADEMIA GESTIONAR</span>
+      <span></span>
     </footer>
-
   </div>
 
-  <!-- MODAL DE REGISTRO DE PARTICIPANTE Y DECLARACIÓN JURADA -->
   <div id="terms-modal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
         <span class="category-meta">> REGISTRO DE PARTICIPANTE</span>
         <h2 class="modal-title">Datos del Administrador</h2>
       </div>
-
       <p class="modal-intro">
         Ingresá tus datos obligatorios para habilitar el cuestionario y registrar tus puntos:
       </p>
-
-      <!-- FORMULARIO DE DATOS -->
       <div class="form-grid">
         <div class="input-group">
           <label for="reg-name">NOMBRE *</label>
@@ -184,34 +153,28 @@
           <input type="text" id="reg-admin" placeholder="Ej: Administración Pérez & Asoc." oninput="validateForm()">
         </div>
       </div>
-
-      <!-- DECLARACIONES Y TÉRMINOS LEGALES -->
       <div class="terms-list">
         <label class="term-item">
           <input type="checkbox" id="check-age" onchange="validateForm()">
           <span class="custom-checkbox"></span>
           <span class="term-text">Declaro bajo juramento ser mayor de 18 años de edad.</span>
         </label>
-
         <label class="term-item">
           <input type="checkbox" id="check-admin" onchange="validateForm()">
           <span class="custom-checkbox"></span>
-          <span class="term-text">Declaro en carácter de Declaración Jurada ser Administrador de Consorcios en ejercicio, con al menos 1 (uno) o más consorcios activos bajo mi gestión en la Ciudad Autónoma de Buenos Aires (CABA) y/o Gran Buenos Aires (GBA).</span>
+          <span class="term-text">Declaro en carácter de Declaración Jurada ser Administrador de Consorcios en ejercicio, con al menos 1 (uno) o más consorcios activos bajo mi gestión en CABA y/o GBA.</span>
         </label>
-
         <label class="term-item">
           <input type="checkbox" id="check-terms" onchange="validateForm()">
           <span class="custom-checkbox"></span>
-          <span class="term-text">Acepto las Bases, Términos y Condiciones del concurso, y autorizo expresamente a las empresas organizadoras y/o patrocinadoras a contactarme telefónicamente, por WhatsApp o correo electrónico para la comercialización y ofrecimiento de productos y servicios.</span>
+          <span class="term-text">Acepto las Bases, Términos y Condiciones del concurso, y autorizo expresamente a las empresas organizadoras a contactarme.</span>
         </label>
-
         <label class="term-item">
           <input type="checkbox" id="check-penalty" onchange="validateForm()">
           <span class="custom-checkbox"></span>
-          <span class="term-text">Entiendo y acepto que la veracidad de lo declarado es condición excluyente. En caso de falsedad, inexactitud o incumplimiento de cualquiera de las condiciones, acepto quedar automáticamente descalificado/a de la competencia, perdiendo sin derecho a reclamo la adjudicación de cualquier premio.</span>
+          <span class="term-text">Entiendo y acepto que la veracidad de lo declarado es condición excluyente. En caso de falsedad, acepto quedar descalificado/a.</span>
         </label>
       </div>
-
       <div class="modal-actions">
         <button id="btn-confirm-start" class="btn-noir" disabled onclick="confirmAndStart()">
           CONFIRMAR Y JUGAR_

@@ -107,10 +107,13 @@ function validateForm() {
 }
 
 async function confirmAndStart() {
-  const email = document.getElementById('reg-email').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
 
-  // Verificar si el correo ya participó en Supabase
-  if (supabaseClient) {
+  // DOMINIOS DE PRUEBA / EXCEPCIÓN
+  const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar');
+
+  // Si NO es un correo tester, verificar si ya jugó en la Base de Datos Supabase
+  if (!isTester && supabaseClient) {
     try {
       const { data } = await supabaseClient
         .from('participantes')
@@ -239,8 +242,13 @@ function handleAnswer(selectedIndex, selectedBtn) {
 async function finishQuiz() {
   stopTimer();
   
-  // Bloquear reintento localmente
-  localStorage.setItem('quiz_played', 'true');
+  const email = currentUser ? currentUser.email.toLowerCase() : '';
+  const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar');
+
+  // Solo bloquear reintento local si NO es un tester
+  if (!isTester) {
+    localStorage.setItem('quiz_played', 'true');
+  }
 
   const progressFill = document.getElementById('progress-fill');
   if (progressFill) progressFill.style.width = '100%';
