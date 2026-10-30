@@ -24,14 +24,12 @@ let timerInterval = null;
 let secondsElapsed = 0;
 let currentUser = null;
 
-// Al cargar la página, aseguramos que la pantalla de inicio esté activa y limpia
 window.addEventListener('DOMContentLoaded', () => {
   showScreen('screen-start');
   loadQuestions();
   setupEmailListener();
 });
 
-// Detección automática para anular el campo administración si es tester (@gestionar.com u @octopus.com.ar)
 function setupEmailListener() {
   const emailInput = document.getElementById('reg-email');
   const adminInput = document.getElementById('reg-admin');
@@ -63,24 +61,11 @@ function setupEmailListener() {
   }
 }
 
-// Cargar preguntas desde JSON y barajar opciones aleatoriamente manteniendo la respuesta correcta
 async function loadQuestions() {
   try {
     const response = await fetch('preguntas.json');
     if(!response.ok) throw new Error("No se pudo cargar preguntas.json");
-    const rawQuestions = await response.json();
-    
-    allQuestions = rawQuestions.map(q => {
-      const originalCorrectText = q.opciones[q.correcta];
-      const shuffledOptions = [...q.opciones].sort(() => Math.random() - 0.5);
-      const newCorrectIndex = shuffledOptions.indexOf(originalCorrectText);
-      
-      return {
-        ...q,
-        opciones: shuffledOptions,
-        correcta: newCorrectIndex
-      };
-    });
+    allQuestions = await response.json();
   } catch (err) {
     console.warn("Cargando preguntas de reserva local por error en fetch:", err);
     allQuestions = [
@@ -106,13 +91,11 @@ async function loadQuestions() {
   }
 }
 
-// FUNCIONES DEL MODAL Y REGISTRO
 function openTermsModal() {
   const emailInput = document.getElementById('reg-email');
   const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
   const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar') || email.includes('@gestionar') || email.includes('@octopus');
 
-  // Si no es tester y ya jugó, mostramos pantalla de ya participó
   if (!isTester && localStorage.getItem('quiz_played') === 'true') {
     showScreen('screen-already-played');
     loadLeaderboard('already-played-leaderboard');
@@ -153,11 +136,8 @@ function validateForm() {
 
 async function confirmAndStart() {
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
-
-  // EXCEPCIÓN DE PRUEBA / TESTER EXACTA
   const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar') || email.includes('@gestionar') || email.includes('@octopus');
 
-  // Si NO es un correo tester, verificar si ya jugó en la Base de Datos Supabase
   if (!isTester && supabaseClient) {
     try {
       const { data } = await supabaseClient
@@ -191,10 +171,24 @@ async function confirmAndStart() {
   startQuiz();
 }
 
-// Iniciar Quiz
 function startQuiz() {
-  const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
-  currentQuestions = shuffled.slice(0, QUESTIONS_PER_ROUND);
+  // Seleccionamos aleatoriamente 10 preguntas
+  const shuffledQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
+  const selected = shuffledQuestions.slice(0, QUESTIONS_PER_ROUND);
+  
+  // BARAJAMOS LAS OPCIONES DE CADA PREGUNTA AL INICIAR LA PARTIDA
+  currentQuestions = selected.map(q => {
+    const correctText = q.opciones[q.correcta];
+    const optionsCopy = [...q.opciones];
+    const shuffledOptions = optionsCopy.sort(() => Math.random() - 0.5);
+    const newCorrectIndex = shuffledOptions.indexOf(correctText);
+    
+    return {
+      ...q,
+      opciones: shuffledOptions,
+      correcta: newCorrectIndex
+    };
+  });
   
   currentIndex = 0;
   score = 0;
@@ -215,7 +209,6 @@ function startQuiz() {
   renderQuestion();
 }
 
-// Renderizar Pregunta Activa
 function renderQuestion() {
   const q = currentQuestions[currentIndex];
 
@@ -247,7 +240,6 @@ function renderQuestion() {
   });
 }
 
-// Procesar Respuesta
 function handleAnswer(selectedIndex, selectedBtn) {
   const q = currentQuestions[currentIndex];
   const allBtns = document.querySelectorAll('.option-item');
@@ -284,7 +276,6 @@ function handleAnswer(selectedIndex, selectedBtn) {
   }, 1300);
 }
 
-// Finalizar Quiz y Guardar en Supabase
 async function finishQuiz() {
   stopTimer();
   
@@ -328,7 +319,6 @@ async function finishQuiz() {
   loadLeaderboard('leaderboard-body');
 }
 
-// Cargar Top 5 en Tabla de Posiciones
 async function loadLeaderboard(containerId) {
   const container = document.getElementById(containerId);
   if (!container || !supabaseClient) return;
@@ -358,7 +348,6 @@ async function loadLeaderboard(containerId) {
   }
 }
 
-// Control del temporizador
 function startTimer() {
   stopTimer();
   timerInterval = setInterval(() => {
