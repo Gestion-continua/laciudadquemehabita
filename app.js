@@ -24,20 +24,18 @@ let timerInterval = null;
 let secondsElapsed = 0;
 let currentUser = null;
 
-// Verificar sesión previa al cargar
+// Verificar sesión previa al cargar, EXCEPTO si es tester
 window.addEventListener('DOMContentLoaded', () => {
-  checkPreviousSession();
   loadQuestions();
   setupEmailListener();
-});
-
-function checkPreviousSession() {
+  
+  // Limpiamos la traba estricta de localStorage para evitar bloqueos fantasma en pruebas
   const played = localStorage.getItem('quiz_played');
   if (played === 'true') {
-    showScreen('screen-already-played');
-    loadLeaderboard('already-played-leaderboard');
+    // Si ya jugó pero queremos permitir testers, verificamos si Supabase tiene su registro o dejamos entrar
+    // Dejamos que el modal valide según el correo ingresado.
   }
-}
+});
 
 // Detección automática para anular el campo administración si es tester
 function setupEmailListener() {
@@ -45,7 +43,7 @@ function setupEmailListener() {
   const adminInput = document.getElementById('reg-admin');
 
   if (emailInput && adminInput) {
-    emailInput.addEventListener('input', () => {
+    const checkTesterField = () => {
       const email = emailInput.value.trim().toLowerCase();
       const isTester = email.includes('@octopus') || email.includes('@gestionar');
 
@@ -63,7 +61,11 @@ function setupEmailListener() {
         adminInput.style.color = "#fff";
       }
       validateForm();
-    });
+    };
+
+    emailInput.addEventListener('input', checkTesterField);
+    emailInput.addEventListener('change', checkTesterField);
+    emailInput.addEventListener('keyup', checkTesterField);
   }
 }
 
@@ -74,7 +76,6 @@ async function loadQuestions() {
     if(!response.ok) throw new Error("No se pudo cargar preguntas.json");
     const rawQuestions = await response.json();
     
-    // Barajar opciones de cada pregunta para que la respuesta correcta no esté siempre fija
     allQuestions = rawQuestions.map(q => {
       const originalCorrectText = q.opciones[q.correcta];
       const shuffledOptions = [...q.opciones].sort(() => Math.random() - 0.5);
@@ -113,10 +114,17 @@ async function loadQuestions() {
 
 // FUNCIONES DEL MODAL Y REGISTRO
 function openTermsModal() {
-  if (localStorage.getItem('quiz_played') === 'true') {
+  const emailInput = document.getElementById('reg-email');
+  const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+  const isTester = email.includes('@octopus') || email.includes('@gestionar');
+
+  // Si no es tester y ya jugó, mostramos pantalla de ya participó
+  if (!isTester && localStorage.getItem('quiz_played') === 'true') {
     showScreen('screen-already-played');
+    loadLeaderboard('already-played-leaderboard');
     return;
   }
+
   const modal = document.getElementById('terms-modal');
   if(modal) modal.classList.add('active');
 }
