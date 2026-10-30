@@ -57,3 +57,57 @@ body { background-color: #0d0d0d; color: #e0e0e0; font-family: 'Noto Sans Mono',
 .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
 .btn-cancel { background: none; border: none; color: #888; font-family: 'Noto Sans Mono', monospace; font-size: 0.85rem; cursor: pointer; }
 .btn-cancel:hover { color: #fff; }
+/* Tarjeta Literaria Porteña para Resultados */
+.tarjeta-literaria {
+  position: relative;
+  background-color: rgba(15, 23, 42, 0.75);
+  border-left: 4px solid #3b82f6;
+  border-radius: 8px;
+  padding: 18px 20px 16px 20px;
+  margin: 20px 0;
+  text-align: left;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+}
+
+.comilla-icono {
+  position: absolute;
+  top: -8px;
+  right: 15px;
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.15);
+  font-family: Georgia, serif;
+  line-height: 1;
+  user-select: none;
+}
+
+.frase-texto {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+  margin: 0 0 12px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.autor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 8px;
+}
+
+.autor-nombre {
+  font-weight: 700;
+  color: #f39c12;
+  font-size: 0.9rem;
+}
+
+.autor-libro {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-style: italic;
+}
