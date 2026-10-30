@@ -1,4 +1,4 @@
-// --- CONFIGURACIÓN DE SUPABASE ---
+/ --- CONFIGURACIÓN DE SUPABASE ---
 const SUPABASE_URL = "https://bcpstmfxemrcidwgthxx.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_cauPjclntOUrIeeQxpftAg_icxWbiVD";
 
@@ -28,6 +28,7 @@ let currentUser = null;
 window.addEventListener('DOMContentLoaded', () => {
   checkPreviousSession();
   loadQuestions();
+  setupEmailListener();
 });
 
 function checkPreviousSession() {
@@ -35,6 +36,34 @@ function checkPreviousSession() {
   if (played === 'true') {
     showScreen('screen-already-played');
     loadLeaderboard('already-played-leaderboard');
+  }
+}
+
+// Detección automática para anular el campo administración si es tester
+function setupEmailListener() {
+  const emailInput = document.getElementById('reg-email');
+  const adminInput = document.getElementById('reg-admin');
+
+  if (emailInput && adminInput) {
+    emailInput.addEventListener('input', () => {
+      const email = emailInput.value.trim().toLowerCase();
+      const isTester = email.includes('@octopus') || email.includes('@gestionar');
+
+      if (isTester) {
+        adminInput.value = "usuario tester";
+        adminInput.disabled = true;
+        adminInput.style.backgroundColor = "#222";
+        adminInput.style.color = "#f39c12";
+      } else {
+        if (adminInput.value === "usuario tester") {
+          adminInput.value = "";
+        }
+        adminInput.disabled = false;
+        adminInput.style.backgroundColor = "#000";
+        adminInput.style.color = "#fff";
+      }
+      validateForm();
+    });
   }
 }
 
@@ -89,7 +118,8 @@ function validateForm() {
   const lastname = document.getElementById('reg-lastname')?.value.trim() || '';
   const email = document.getElementById('reg-email')?.value.trim() || '';
   const phone = document.getElementById('reg-phone')?.value.trim() || '';
-  const admin = document.getElementById('reg-admin')?.value.trim() || '';
+  const adminInput = document.getElementById('reg-admin');
+  const admin = adminInput ? adminInput.value.trim() : '';
 
   const checkAge = document.getElementById('check-age')?.checked || false;
   const checkAdmin = document.getElementById('check-admin')?.checked || false;
@@ -109,8 +139,8 @@ function validateForm() {
 async function confirmAndStart() {
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
 
-  // DOMINIOS DE PRUEBA / EXCEPCIÓN
-  const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar');
+  // EXCEPCIÓN DE PRUEBA / TESTER
+  const isTester = email.includes('@octopus') || email.includes('@gestionar');
 
   // Si NO es un correo tester, verificar si ya jugó en la Base de Datos Supabase
   if (!isTester && supabaseClient) {
@@ -133,12 +163,13 @@ async function confirmAndStart() {
     }
   }
 
+  const adminInput = document.getElementById('reg-admin');
   currentUser = {
     nombre: document.getElementById('reg-name').value.trim(),
     apellido: document.getElementById('reg-lastname').value.trim(),
     email: email,
     telefono: document.getElementById('reg-phone').value.trim(),
-    administracion: document.getElementById('reg-admin').value.trim()
+    administracion: isTester ? "usuario tester" : (adminInput ? adminInput.value.trim() : '')
   };
 
   closeTermsModal();
@@ -243,7 +274,7 @@ async function finishQuiz() {
   stopTimer();
   
   const email = currentUser ? currentUser.email.toLowerCase() : '';
-  const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar');
+  const isTester = email.includes('@octopus') || email.includes('@gestionar');
 
   // Solo bloquear reintento local si NO es un tester
   if (!isTester) {
