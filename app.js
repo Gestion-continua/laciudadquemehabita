@@ -1,4 +1,4 @@
-/ --- CONFIGURACIÓN DE SUPABASE ---
+// --- CONFIGURACIÓN DE SUPABASE ---
 const SUPABASE_URL = "https://bcpstmfxemrcidwgthxx.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_cauPjclntOUrIeeQxpftAg_icxWbiVD";
 
@@ -67,12 +67,25 @@ function setupEmailListener() {
   }
 }
 
-// Cargar preguntas desde JSON
+// Cargar preguntas desde JSON y barajar opciones aleatoriamente manteniendo la respuesta correcta
 async function loadQuestions() {
   try {
     const response = await fetch('preguntas.json');
     if(!response.ok) throw new Error("No se pudo cargar preguntas.json");
-    allQuestions = await response.json();
+    const rawQuestions = await response.json();
+    
+    // Barajar opciones de cada pregunta para que la respuesta correcta no esté siempre fija
+    allQuestions = rawQuestions.map(q => {
+      const originalCorrectText = q.opciones[q.correcta];
+      const shuffledOptions = [...q.opciones].sort(() => Math.random() - 0.5);
+      const newCorrectIndex = shuffledOptions.indexOf(originalCorrectText);
+      
+      return {
+        ...q,
+        opciones: shuffledOptions,
+        correcta: newCorrectIndex
+      };
+    });
   } catch (err) {
     console.warn("Cargando preguntas de reserva local por error en fetch:", err);
     allQuestions = [
@@ -276,7 +289,6 @@ async function finishQuiz() {
   const email = currentUser ? currentUser.email.toLowerCase() : '';
   const isTester = email.includes('@octopus') || email.includes('@gestionar');
 
-  // Solo bloquear reintento local si NO es un tester
   if (!isTester) {
     localStorage.setItem('quiz_played', 'true');
   }
@@ -291,7 +303,6 @@ async function finishQuiz() {
   const footerStatus = document.getElementById('footer-status');
   if (footerStatus) footerStatus.textContent = 'STATUS: FINISHED';
 
-  // Guardar en Supabase
   if (supabaseClient && currentUser) {
     try {
       await supabaseClient.from('participantes').insert([
