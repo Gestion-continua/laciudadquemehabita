@@ -13,6 +13,40 @@ const CATEGORY_BACKGROUNDS = {
   "Provincia de Bs. As.": "images/provincia.jpg"
 };
 
+// FRASES LITERARIAS SOBRE BUENOS AIRES
+const FRASES_BUENOS_AIRES = [
+  {
+    frase: "A mí se me hace cuento que empezó Buenos Aires: la juzgo tan eterna como el agua y como el aire.",
+    autor: "Jorge Luis Borges",
+    libro: "Fundación mítica de Buenos Aires"
+  },
+  {
+    frase: "Buenos Aires es una ciudad que a veces duele, pero siempre espera con la luz encendida en alguna esquina.",
+    autor: "Alejandro Dolina",
+    libro: "El Ángel Gris"
+  },
+  {
+    frase: "Buenos Aires es una ciudad monstruosa y fascinante, donde la soledad se multiplica en cada esquina y en cada madrugada de niebla.",
+    autor: "Ernesto Sábato",
+    libro: "Sobre héroes y tumbas"
+  },
+  {
+    frase: "Andábamos sin buscarnos, pero sabiendo que andábamos para encontrarnos por las calles de Buenos Aires.",
+    autor: "Julio Cortázar",
+    libro: "Rayuela"
+  },
+  {
+    frase: "En Flores los ángeles son grises, los amigos se reúnen en los cafés a discutir sobre lo imposible, y la nostalgia es una forma de la felicidad.",
+    autor: "Alejandro Dolina",
+    libro: "El Ángel Gris"
+  },
+  {
+    frase: "Las calles de Buenos Aires ya son mi entraña. No las ávidas calles de la tierra avasadora, sino las calles disecadas por el hábito.",
+    autor: "Jorge Luis Borges",
+    libro: "Fervor de Buenos Aires"
+  }
+];
+
 const QUESTIONS_PER_ROUND = 10;
 let allQuestions = [];
 let currentQuestions = [];
@@ -172,24 +206,22 @@ async function confirmAndStart() {
 }
 
 function startQuiz() {
-  // Seleccionamos aleatoriamente 10 preguntas
   const shuffledQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
   const selected = shuffledQuestions.slice(0, QUESTIONS_PER_ROUND);
-  
-  // BARAJAMOS LAS OPCIONES DE CADA PREGUNTA AL INICIAR LA PARTIDA
+
   currentQuestions = selected.map(q => {
     const correctText = q.opciones[q.correcta];
     const optionsCopy = [...q.opciones];
     const shuffledOptions = optionsCopy.sort(() => Math.random() - 0.5);
     const newCorrectIndex = shuffledOptions.indexOf(correctText);
-    
+
     return {
       ...q,
       opciones: shuffledOptions,
       correcta: newCorrectIndex
     };
   });
-  
+
   currentIndex = 0;
   score = 0;
   correctCount = 0;
@@ -202,10 +234,10 @@ function startQuiz() {
 
   startTimer();
   showScreen('screen-quiz');
-  
+
   const footerStatus = document.getElementById('footer-status');
   if (footerStatus) footerStatus.textContent = 'STATUS: RUNNING';
-  
+
   renderQuestion();
 }
 
@@ -216,7 +248,7 @@ function renderQuestion() {
   if (bgImg && CATEGORY_BACKGROUNDS[q.categoria]) {
     bgImg.src = CATEGORY_BACKGROUNDS[q.categoria];
   }
-  
+
   const progressFill = document.getElementById('progress-fill');
   if (progressFill) {
     const progressPercent = ((currentIndex) / QUESTIONS_PER_ROUND) * 100;
@@ -225,7 +257,7 @@ function renderQuestion() {
 
   document.getElementById('quiz-category').textContent = `> ${q.categoria.toUpperCase()}`;
   document.getElementById('quiz-question').textContent = q.pregunta;
-  document.getElementById('counter-display').textContent = 
+  document.getElementById('counter-display').textContent =
     `${String(currentIndex + 1).padStart(2, '0')}/${String(Math.min(currentQuestions.length, QUESTIONS_PER_ROUND)).padStart(2, '0')}`;
 
   const optionsContainer = document.getElementById('quiz-options');
@@ -245,7 +277,7 @@ function handleAnswer(selectedIndex, selectedBtn) {
   const allBtns = document.querySelectorAll('.option-item');
   const flashLayer = document.getElementById('feedback-flash');
   const mainWrapper = document.getElementById('main-wrapper');
-  
+
   allBtns.forEach(btn => btn.disabled = true);
 
   if(selectedIndex === q.correcta) {
@@ -276,9 +308,14 @@ function handleAnswer(selectedIndex, selectedBtn) {
   }, 1300);
 }
 
+function obtenerFraseAleatoria() {
+  const idx = Math.floor(Math.random() * FRASES_BUENOS_AIRES.length);
+  return FRASES_BUENOS_AIRES[idx];
+}
+
 async function finishQuiz() {
   stopTimer();
-  
+
   const email = currentUser ? currentUser.email.toLowerCase() : '';
   const isTester = email.endsWith('@gestionar.com') || email.endsWith('@octopus.com.ar') || email.includes('@gestionar') || email.includes('@octopus');
 
@@ -288,10 +325,26 @@ async function finishQuiz() {
 
   const progressFill = document.getElementById('progress-fill');
   if (progressFill) progressFill.style.width = '100%';
-  
+
   const accuracy = Math.round((correctCount / currentQuestions.length) * 100);
   document.getElementById('res-score').textContent = score;
   document.getElementById('res-accuracy').textContent = `${accuracy}%`;
+
+  // Renderizado de la cita literaria al azar
+  const fraseContainer = document.getElementById('frase-literaria-container');
+  if (fraseContainer) {
+    const cita = obtenerFraseAleatoria();
+    fraseContainer.innerHTML = `
+      <div class="tarjeta-literaria">
+        <div class="comilla-icono">“</div>
+        <p class="frase-texto">${cita.frase}</p>
+        <div class="autor-info">
+          <span class="autor-nombre">— ${cita.autor}</span>
+          <span class="autor-libro">${cita.libro}</span>
+        </div>
+      </div>
+    `;
+  }
 
   const footerStatus = document.getElementById('footer-status');
   if (footerStatus) footerStatus.textContent = 'STATUS: FINISHED';
@@ -366,4 +419,8 @@ function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const targetScreen = document.getElementById(screenId);
   if (targetScreen) targetScreen.classList.add('active');
+}
+
+function reiniciarQuiz() {
+  showScreen('screen-start');
 }
