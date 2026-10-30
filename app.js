@@ -420,7 +420,3 @@ function showScreen(screenId) {
   const targetScreen = document.getElementById(screenId);
   if (targetScreen) targetScreen.classList.add('active');
 }
-
-function reiniciarQuiz() {
-  showScreen('screen-start');
-}

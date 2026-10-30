@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quiz Interactivo - Desafío Urbano</title>
+  <title>La ciudad que me habita - Desafío Urbano</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Noto+Sans+Mono:wght@300;400;600&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
     <header class="top-bar">
       <div class="status-tag">
         <span class="status-dot"></span>
-        <span id="system-status">EPA| 10 AÑOS</span>
+        <span id="system-status">EPA 10 AÑOS</span>
       </div>
       <div class="progress-container">
         <div class="progress-fill" id="progress-fill"></div>
@@ -38,14 +38,13 @@
     <section id="screen-start" class="screen active">
       <img src="images/logo-epa.png" alt="Logo EPA" class="epa-logo" />
       <div>
-        <h1 class="hero-title">LA CI<i>UDAD</i></span>
-        <h1 class="hero-title">QUE ME HABITA</h1>
+        <span class="category-meta">> BUENOS AIRES // EVALUACIÓN</span>
+        <h1 class="hero-title">La ciudad que me habita</h1>
       </div>
       <p class="question-statement">
-        10 preguntas sobre la historia, arquitectura, gastronomía y leyendas urbanas.
-        ¿Cuanto sabes realmente sobre la ciudad de la furia?
+        Una experiencia inmersiva sobre la historia, arquitectura, gastronomía y leyendas ocultas de la ciudad.
       </p>
-      <button class="btn-noir" id="btn-start-trigger" onclick="openTermsModal()">Comenzar</button>
+      <button class="btn-noir" id="btn-start-trigger" onclick="openTermsModal()">INICIAR EXPERIMENTO_</button>
     </section>
 
     <section id="screen-quiz" class="screen">
@@ -56,6 +55,7 @@
       <div class="options-grid" id="quiz-options"></div>
     </section>
 
+    <!-- PANTALLA DE RESULTADOS ACTUALIZADA -->
     <section id="screen-results" class="screen">
       <div>
         <span class="category-meta">> REGISTRO FINALIZADO</span>
@@ -74,6 +74,10 @@
           <span class="result-lbl">PRECISIÓN</span>
         </div>
       </div>
+
+      <!-- CONTENEDOR PARA LAS FRASES SOBRE BUENOS AIRES -->
+      <div id="frase-literaria-container"></div>
+
       <div class="leaderboard-box">
         <span class="category-meta">> TOP 5 MEJORES PUNTAJES</span>
         <table class="leaderboard-table">
@@ -117,8 +121,8 @@
     </section>
 
     <footer class="bottom-bar">
-      <span id="footer-status">POWERED BY ACADEMIA GESTIONAR</span>
-      <span></span>
+      <span id="footer-status">Powered by Academia Gestionar</span>
+      <span>Suscribite a talleres wepa</span>
     </footer>
   </div>
 
