@@ -10,7 +10,8 @@ const CATEGORY_BACKGROUNDS = {
   "Comunas y Barrios": "images/barrios.jpg",
   "Leyendas Urbanas": "images/leyendas.jpg",
   "Cultura y Gastronomía": "images/cultura.jpg",
-  "Provincia de Bs. As.": "images/provincia.jpg"
+  "Provincia de Bs. As.": "images/provincia.jpg",
+  "Literatura": "images/cultura.jpg"
 };
 
 // FRASES LITERARIAS SOBRE BUENOS AIRES
@@ -330,7 +331,6 @@ async function finishQuiz() {
   document.getElementById('res-score').textContent = score;
   document.getElementById('res-accuracy').textContent = `${accuracy}%`;
 
-  // Renderizado de la cita literaria al azar
   const fraseContainer = document.getElementById('frase-literaria-container');
   if (fraseContainer) {
     const cita = obtenerFraseAleatoria();
@@ -372,6 +372,13 @@ async function finishQuiz() {
   loadLeaderboard('leaderboard-body');
 }
 
+function formatearTiempo(segundos) {
+  if (segundos === undefined || segundos === null) return "--:--";
+  const mins = String(Math.floor(segundos / 60)).padStart(2, '0');
+  const secs = String(segundos % 60).padStart(2, '0');
+  return `${mins}:${secs}`;
+}
+
 async function loadLeaderboard(containerId) {
   const container = document.getElementById(containerId);
   if (!container || !supabaseClient) return;
@@ -379,13 +386,14 @@ async function loadLeaderboard(containerId) {
   try {
     const { data, error } = await supabaseClient
       .from('participantes')
-      .select('nombre, apellido, score, tiempo_segundos')
+      .select('nombre, apellido, score, tiempo_segundos, created_at')
       .order('score', { ascending: false })
       .order('tiempo_segundos', { ascending: true })
+      .order('created_at', { ascending: true })
       .limit(5);
 
     if (error || !data || data.length === 0) {
-      container.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No hay registros cargados aún</td></tr>`;
+      container.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">No hay registros cargados aún</td></tr>`;
       return;
     }
 
@@ -394,10 +402,11 @@ async function loadLeaderboard(containerId) {
         <td><strong>#${index + 1}</strong></td>
         <td>${item.nombre} ${item.apellido ? item.apellido.charAt(0) + '.' : ''}</td>
         <td><strong>${item.score} pts</strong></td>
+        <td style="color: #f39c12; font-family: 'Noto Sans Mono', monospace;">${formatearTiempo(item.tiempo_segundos)}</td>
       </tr>
     `).join('');
   } catch (err) {
-    container.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Error al conectar con el ranking</td></tr>`;
+    container.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">Error al conectar con el ranking</td></tr>`;
   }
 }
 
@@ -405,9 +414,8 @@ function startTimer() {
   stopTimer();
   timerInterval = setInterval(() => {
     secondsElapsed++;
-    const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-    const secs = String(secondsElapsed % 60).padStart(2, '0');
-    document.getElementById('timer-display').textContent = `${mins}:${secs}`;
+    const timerDisplay = document.getElementById('timer-display');
+    if (timerDisplay) timerDisplay.textContent = formatearTiempo(secondsElapsed);
   }, 1000);
 }
 
@@ -419,4 +427,8 @@ function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const targetScreen = document.getElementById(screenId);
   if (targetScreen) targetScreen.classList.add('active');
+}
+
+function reiniciarQuiz() {
+  showScreen('screen-start');
 }
