@@ -146,6 +146,17 @@ function closeTermsModal() {
   if(modal) modal.classList.remove('active');
 }
 
+function openLegalModal(e) {
+  if (e) e.preventDefault();
+  const modal = document.getElementById('legal-terms-modal');
+  if (modal) modal.classList.add('active');
+}
+
+function closeLegalModal() {
+  const modal = document.getElementById('legal-terms-modal');
+  if (modal) modal.classList.remove('active');
+}
+
 function validateForm() {
   const name = document.getElementById('reg-name')?.value.trim() || '';
   const lastname = document.getElementById('reg-lastname')?.value.trim() || '';

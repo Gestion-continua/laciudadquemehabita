@@ -35,17 +35,36 @@
       </div>
     </header>
 
-    <!-- PANTALLA INICIO -->
+    <!-- PANTALLA INICIO (FINALIZADO CON BANNER Y TÉRMINOS) -->
     <section id="screen-start" class="screen active">
       <img src="images/logo-epa.png" alt="Logo EPA" class="epa-logo" />
+      
       <div>
-        <span class="category-meta">¿Cuanto conoces sobre el lugar que trabajas?</span>
+        <span class="category-meta" style="color: #e74c3c;">> CONCURSO FINALIZADO</span>
         <h1 class="hero-title">La ciudad que me habita</h1>
       </div>
+
+      <!-- BANNER DE PRÓXIMAMENTE GANADORES -->
+      <div style="background: rgba(243, 156, 18, 0.15); border: 1px solid #f39c12; border-radius: 8px; padding: 15px; margin: 20px 0; text-align: center; width: 100%; max-width: 450px;">
+        <p style="color: #f39c12; font-weight: bold; margin: 0; font-size: 1.05rem; letter-spacing: 0.5px;">
+          📢 PRÓXIMAMENTE ANUNCIAREMOS LOS GANADORES
+        </p>
+      </div>
+
       <p class="question-statement">
-        Una trivia sobre la historia, arquitectura, literatura y leyendas urbanas de CABA y la Provincia de Buenos Aires. ¿Te animás a ponerte a prueba?
+        El concurso ha concluido. ¡Muchas gracias a todos los Administradores de Consorcios que participaron!
       </p>
-      <button class="btn-noir" id="btn-start-trigger" onclick="openTermsModal()">Comenzar quiz</button>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; width: 100%; max-width: 450px; margin: 0 auto;">
+        <button class="btn-noir" disabled style="opacity: 0.5; cursor: not-allowed; border-color: #555; color: #888; width: 100%;">
+          EVENTO FINALIZADO_
+        </button>
+
+        <!-- BOTÓN TÉRMINOS Y CONDICIONES -->
+        <button class="btn-cancel" onclick="openLegalModal(event)" style="width: 100%; padding: 12px; font-size: 0.85rem; border: 1px solid #f39c12; color: #f39c12; background: transparent; cursor: pointer; border-radius: 4px; font-weight: bold;">
+          📜 VER TÉRMINOS Y CONDICIONES DEL CONCURSO
+        </button>
+      </div>
     </section>
 
     <!-- PANTALLA QUIZ -->
@@ -178,12 +197,14 @@
         <label class="term-item">
           <input type="checkbox" id="check-terms" onchange="validateForm()">
           <span class="custom-checkbox"></span>
-          <span class="term-text">Acepto las Bases, Términos y Condiciones del concurso, y autorizo expresamente a las empresas organizadoras a contactarme.</span>
+          <span class="term-text">
+            Acepto las <a href="#" onclick="openLegalModal(event)" style="color: #f39c12; text-decoration: underline; font-weight: bold;">Bases, Términos y Condiciones</a> del concurso, y autorizo expresamente a las empresas organizadoras a contactarme.
+          </span>
         </label>
         <label class="term-item">
           <input type="checkbox" id="check-penalty" onchange="validateForm()">
           <span class="custom-checkbox"></span>
-          <span class="term-text">Entiendo y acepto que la veracidad de lo declarado es condición excluyente. En caso de falsedad, acepto quedar descalificado/a.</span>
+          <span class="term-text">Entiendo y acepto que la veracidad de lo declaredo es condición excluyente. En caso de falsedad, acepto quedar descalificado/a.</span>
         </label>
       </div>
       <div class="modal-actions">
@@ -191,6 +212,55 @@
           CONFIRMAR Y JUGAR_
         </button>
         <button class="btn-cancel" onclick="closeTermsModal()">[CANCELAR]</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL COMPLETO DE BASES Y CONDICIONES LEGALES -->
+  <div id="legal-terms-modal" class="modal-overlay">
+    <div class="modal-content" style="max-height: 80vh; overflow-y: auto; text-align: left; padding: 25px;">
+      <div class="modal-header" style="margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+        <span class="category-meta">> MARCO LEGAL Y REGLAMENTO OFICIAL</span>
+        <h2 class="modal-title" style="margin-top: 5px;">Bases y Condiciones: "La ciudad que me habita"</h2>
+      </div>
+
+      <div style="font-size: 0.85rem; line-height: 1.6; color: #ccc; margin-bottom: 20px;">
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">1. ORGANIZADOR Y VIGENCIA DE LA PROMOCIÓN</h4>
+        <p>La presente acción promocional y concurso es organizada por la firma organizadora del evento (en adelante, el "Organizador"). El Concurso estuvo activo únicamente el día <strong>3 de noviembre de 2026, entre las 18:00 hs y las 23:00 hs</strong>. Concluido dicho plazo, la plataforma cerró automáticamente la admisión de nuevos intentos.</p>
+
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">2. SIN OBLIGACIÓN DE COMPRA Y GRATUIDAD</h4>
+        <p>La participación en este Concurso es totalmente libre y gratuita, no exigiendo la compra de producto ni la contratación de servicio alguno (cumplimiento de la Ley de Lealtad Comercial N.º 22.802).</p>
+
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">3. REQUISITOS DE PARTICIPACIÓN Y VERACIDAD DE DATOS</h4>
+        <p>Podrán participar exclusivamente personas humanas mayores de 18 años de edad que revistan la condición comprobable de <strong>Administradores de Consorcios en ejercicio activo</strong>, con al menos un (1) consorcio bajo su gestión en CABA y/o Provincia de Buenos Aires. Cada participante es el único y exclusivo responsable de la veracidad, exactitud y autenticidad de los datos ingresados. La consignación de datos falsos o múltiples participaciones mediante maniobras informáticas implicará la descalificación inmediata.</p>
+
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">4. MECÁNICA Y DETERMINACIÓN DE GANADORES</h4>
+        <p>Los ganadores se determinan según el puntaje registrado en la base de datos al cierre del plazo (23:00 hs). Modalidad <strong>One Shot (un solo intento válido por participante)</strong>.<br>
+        <strong>Criterio de Desempate:</strong> En caso de empate en puntos, prevalece el participante con <strong>menor tiempo cronometrado (segundos transcurridos)</strong>. De persistir la igualdad, se toma la marca de tiempo (<em>timestamp</em>) en primer orden cronológico.<br>
+        <strong>Condición de Validación:</strong> Para recibir el premio, el potencial ganador deberá acreditar fehacientemente su condición de Administrador de Consorcios en ejercicio dentro de los 5 días hábiles de notificado; caso contrario, se convocará al siguiente del ranking.</p>
+
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">5. DETALLE Y CONDICIONES ESPECÍFICAS DE LOS PREMIOS</h4>
+        <ul>
+          <li><strong>PRIMER PREMIO:</strong> Un (1) viaje en Crucero a Brasil para dos (2) personas a realizarse entre <strong>abril de 2027 y junio de 2027</strong>. El itinerario exacto, puerto de salida/llegada, cantidad de días y noches, categoría de camarote y fechas definitivas quedan sujetos estrictamente a la disponibilidad técnica, cupos operativos y políticas de reserva de la agencia y/o naviera operadora. Excluye pasajes/traslados al puerto, propinas, consumos extra, excursiones y trámites/documentación personal (pasaportes, visas o seguros médicos).</li>
+          <li><strong>SEGUNDO PREMIO:</strong> Una (1) Cafetera expreso marca Nespresso (o modelo de prestaciones equivalentes según disponibilidad de mercado).</li>
+          <li><strong>TERCER PREMIO:</strong> Un (1) Voucher digital Bigbox por un valor nominal de $200.000.- (doscientos mil pesos argentinos), sujeto a los términos y condiciones de la empresa proveedora (Bigbox S.A.).</li>
+        </ul>
+
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">6. CARÁCTER INTRANSFERIBLE DE LOS PREMIOS</h4>
+        <p>Todos los premios son estrictamente personales e intransferibles. Bajo ninguna circunstancia podrán ser canjeados por dinero en efectivo, divisas, ni por otros bienes o servicios distintos a los enunciados.</p>
+
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">7. LIMITACIÓN DE RESPONSABILIDAD</h4>
+        <p>El Organizador no será responsable por fallas en las redes de telecomunicaciones, interrupciones de conectividad o problemas técnicos ajenos. Una vez entregados los premios, el Organizador queda liberado de toda responsabilidad respecto del uso, calidad o garantías directas del fabricante/prestador.</p>
+
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">8. PROTECCIÓN DE DATOS PERSONALES Y DERECHO DE IMAGEN</h4>
+        <p>Los datos personales son tratados de conformidad con la Ley N.º 25.326. Los ganadores autorizan de manera gratuita e irrevocable al Organizador a difundir sus nombres, apellidos e imagen en redes sociales y medios del evento con fines publicitarios y de transparencia.</p>
+
+        <h4 style="color: #f39c12; margin-top: 15px; margin-bottom: 5px;">9. ACEPTACIÓN DE BASES Y JURISDICCIÓN</h4>
+        <p>La sola participación implica la aceptación plena e incondicional de estas Bases. Para cualquier controversia judicial, las partes se someten a la jurisdicción de los Tribunales Ordinarios en lo Comercial de la Ciudad Autónoma de Buenos Aires.</p>
+      </div>
+
+      <div class="modal-actions" style="border-top: 1px solid #333; padding-top: 15px; text-align: center;">
+        <button class="btn-noir" onclick="closeLegalModal()" style="width: 100%;">CERRAR TÉRMINOS Y CONDICIONES_</button>
       </div>
     </div>
   </div>
